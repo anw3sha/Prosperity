@@ -14,8 +14,26 @@ class Trader:
         for product in state.order_depths:
             order_depth: OrderDepth = state.order_depths[product]
             orders: List[Order] = []
-            if product == 'AMETHYSTS':
-                acceptable_price = 10000
+        if product == 'AMETHYSTS':
+            try:
+                trader_data = jsonpickle.decode(state.traderData)
+            except:
+                trader_data = {'AMETHYSTS': []}
+
+            # Calculate the mid price of the current state
+            if len(order_depth.sell_orders) != 0 and len(order_depth.buy_orders) != 0:
+                total_price = sum(order_depth.sell_orders.keys()) + sum(order_depth.buy_orders.keys())
+                total_orders = len(order_depth.sell_orders) + len(order_depth.buy_orders)
+                mid_price = total_price / total_orders
+
+                # Add the mid price to the list of previous mid prices
+                trader_data['AMETHYSTS'].append(mid_price)
+
+                # If there are more than 50 entries, calculate the average of the last 50 mid prices
+                if len(trader_data['AMETHYSTS']) > 50:
+                    acceptable_price = sum(trader_data['AMETHYSTS'][-50:]) / 50
+                else:
+                    acceptable_price = 10000  # Default price for the first 50 entries
 
                 print("Acceptable price : " + str(acceptable_price))
                 print("Buy Order depth : " + str(len(order_depth.buy_orders)) + ", Sell order depth : " + str(len(order_depth.sell_orders)))
