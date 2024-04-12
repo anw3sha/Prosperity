@@ -31,7 +31,33 @@ class Trader:
                     if int(best_bid) > acceptable_price:
                         print("SELL", str(best_bid_amount) + "x", best_bid)
                         orders.append(Order(product, best_bid, -best_bid_amount))
-                        
+            
+            elif product == 'STARFRUIT':
+                try:
+                    trader_data = jsonpickle.decode(state.traderData)
+                except:
+                    trader_data = {}
+                time = state.timestamp
+                if time < 10000:
+                    acceptable_price = 5035                                                                                                                                                                                                                                                        
+                else:
+                    acceptable_price = 5060
+
+                    print("Acceptable price : " + str(acceptable_price))
+                    print("Buy Order depth : " + str(len(order_depth.buy_orders)) + ", Sell order depth : " + str(len(order_depth.sell_orders)))
+        
+                    if len(order_depth.sell_orders) != 0:
+                        best_ask, best_ask_amount = list(order_depth.sell_orders.items())[0]
+                        if int(best_ask) < acceptable_price:
+                            print("BUY", str(-best_ask_amount) + "x", best_ask)
+                            orders.append(Order(product, best_ask, -best_ask_amount))
+        
+                    if len(order_depth.buy_orders) != 0:
+                        best_bid, best_bid_amount = list(order_depth.buy_orders.items())[0]
+                        if int(best_bid) > acceptable_price:
+                            print("SELL", str(best_bid_amount) + "x", best_bid)
+                            orders.append(Order(product, best_bid, -best_bid_amount))
+
             else:
                 # for starfruit, it's a more complex strategy (because it changes frequently and acts more like a common stock)
                 # the price range seems to be around 5000 but fluctuates a lot
@@ -58,7 +84,7 @@ class Trader:
                     best_ask, best_ask_amount = list(order_depth.sell_orders.items())[0]
                     if int(best_ask) < acceptable_buy:
                         print("BUY", str(-best_ask_amount) + "x", best_ask)
-                        orders.append(Order(product, best_ask, -best_ask_amount)
+                        orders.append(Order(product, best_ask, -best_ask_amount))
         
                 if len(order_depth.buy_orders) != 0:
                     best_bid, best_bid_amount = list(order_depth.buy_orders.items())[0]
@@ -70,7 +96,7 @@ class Trader:
             result[product] = orders
     
     
-        traderData = jsonpickle.encode(trader_data) # "SAMPLE" # String value holding Trader state data required. It will be delivered as TradingState.traderData on next execution.
+        traderData = "SAMPLE" # jsonpickle.encode(trader_data) # String value holding Trader state data required. It will be delivered as TradingState.traderData on next execution.
         
         conversions = 1
         return result, conversions, traderData
